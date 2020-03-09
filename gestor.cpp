@@ -224,9 +224,11 @@ void Gestor::eliminar()
 {
     bool found = false;
     unsigned int opc;
-    unsigned char tam;
-    char auxChar;
+    unsigned int tmpInt;
+    float tmpFloat;
+    char tmpStr[LARGO_NOMBRE];
     string aux;
+    Usuario usuario;
     fstream archivo("usuarios.bin", ios::in | ios::out);
     fstream tmp("usuarios.tmp", ios::out);
 
@@ -240,29 +242,63 @@ void Gestor::eliminar()
         cin >> opc;
         if (opc <= m_codigos.size() && opc)
         {
-            while (!archivo.eof())
+            for (unsigned int i = 0; i < m_codigos.size(); ++i)
             {
-                for (int i = 0; i < CANTIDAD_CAMPOS; i++)
+                archivo.read((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
+                usuario.setCodigo(tmpStr);
+
+                archivo.read((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
+                usuario.setNombre(tmpStr);
+
+                archivo.read((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
+                usuario.setApellido(tmpStr);
+
+                archivo.read((char*)&tmpInt, sizeof(tmpInt));
+                usuario.setEdad(tmpInt);
+
+                archivo.read((char*)&tmpStr[0], sizeof(char));
+                usuario.setGenero(tmpStr[0]);
+
+                archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+                usuario.setPeso(tmpFloat);
+
+                archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+                usuario.setMasaCorporal(tmpFloat);
+
+                archivo.read((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
+                usuario.setTipoSangre(tmpStr);
+                
+                archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+                usuario.setAltura(tmpFloat);
+
+                if (i + 1 != opc)
                 {
-                    aux = "";
-                    archivo.read((char*)&tam, sizeof(tam));
-                    if (archivo.eof())
-                        break;
+                    strcpy(tmpStr, usuario.getCodigo());
+                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
+
+                    strcpy(tmpStr, usuario.getNombre());
+                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
+
+                    strcpy(tmpStr, usuario.getApellido());
+                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
+
+                    tmpInt = usuario.getEdad();
+                    tmp.write((char*)&tmpInt, sizeof(tmpInt));
+
+                    tmpStr[0] = usuario.getGenero();
+                    tmp.write((char*)&tmpStr[0], sizeof(char));
+
+                    tmpFloat = usuario.getPeso();
+                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
+
+                    tmpFloat = usuario.getMasaCorporal();
+                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
+
+                    strcpy(tmpStr, usuario.getTipoSangre());
+                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
                     
-                    for (int j = 0; j < int(tam); ++j)
-                    {
-                        archivo.get(auxChar);
-                        aux += auxChar;
-                    }
-                    if (!i && m_codigos[opc - 1] == aux)
-                        found = true;
-                    else if (found && i == CANTIDAD_CAMPOS - 1)
-                        found = false;
-                    else if (!found)
-                    {
-                        tmp.write((char*)&tam, sizeof(tam));
-                        tmp << aux;         
-                    }
+                    tmpFloat = usuario.getAltura();
+                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
                 }
             }
             m_codigos.erase(m_codigos.begin() + opc - 1);
@@ -520,7 +556,6 @@ void Gestor::mostrar()
             
             archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
             usuario.setAltura(tmpFloat);
-            
             ++ cont;
 
             if (cont)
