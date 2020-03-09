@@ -22,9 +22,8 @@ Gestor::Gestor()
             archivo.read((char*)&tmpCod, sizeof(tmpCod));
             if (archivo.eof())
                 break;
-            if (strlen(tmpCod) == 9)
-                m_codigos.push_back(tmpStr);
 
+            m_codigos.push_back(tmpCod);
             archivo.read((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
             archivo.read((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
             archivo.read((char*)&tmpInt, sizeof(tmpInt));
@@ -117,43 +116,42 @@ void Gestor::buscar()
         cout << " Ingrese el código a buscar: ";
         getline(cin, codigo);
 
-        for (unsigned int i = 0; !archivo.eof(); ++i)
+        for (unsigned int i = 0; i < m_codigos.size(); ++i)
         {
-            if (m_codigos[i] == tmpStr)
+            archivo.read((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
+            usuarioTmp.setCodigo(tmpStr);
+
+            archivo.read((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
+            usuarioTmp.setNombre(tmpStr);
+
+            archivo.read((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
+            usuarioTmp.setApellido(tmpStr);
+
+            archivo.read((char*)&tmpInt, sizeof(tmpInt));
+            usuarioTmp.setEdad(tmpInt);
+
+            archivo.read((char*)&tmpStr[0], sizeof(char));
+            usuarioTmp.setGenero(tmpStr[0]);
+
+            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+            usuarioTmp.setPeso(tmpFloat);
+
+            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+            usuarioTmp.setMasaCorporal(tmpFloat);
+
+            archivo.read((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
+            usuarioTmp.setTipoSangre(tmpStr);
+            
+            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+            usuarioTmp.setAltura(tmpFloat);
+
+            cout << m_codigos[i] << " | " << usuarioTmp.getCodigo() << endl;
+
+            if (codigo == usuarioTmp.getCodigo())
             {
-                archivo.read((char*)&tmpStr, sizeof(LARGO_CODIGO));
-                if (archivo.eof())
-                    break;
-
-                usuarioTmp.setCodigo(tmpStr);
-
-                archivo.read((char*)&tmpStr, sizeof(LARGO_NOMBRE));
-                usuarioTmp.setNombre(tmpStr);
-
-                archivo.read((char*)&tmpStr, sizeof(LARGO_APELLIDO));
-                usuarioTmp.setApellido(tmpStr);
-
-                archivo.read((char*)&tmpInt, sizeof(tmpInt));
-                usuarioTmp.setEdad(tmpInt);
-
-                archivo.read((char*)&tmpStr[0], sizeof(char));
-                usuarioTmp.setGenero(tmpStr[0]);
-
-                archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-                usuarioTmp.setPeso(tmpFloat);
-
-                archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-                usuarioTmp.setMasaCorporal(tmpFloat);
-
-                archivo.read((char*)&tmpStr, sizeof(LARGO_TIPO_SANGRE));
-                usuarioTmp.setTipoSangre(tmpStr);
-                
-                archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-                usuarioTmp.setAltura(tmpFloat);
-            }
-
-            if (codigo ==  usuarioTmp.getCodigo())
                 found = true;
+                break;
+            }
         }
         if (found)
         {
