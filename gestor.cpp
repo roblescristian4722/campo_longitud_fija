@@ -71,7 +71,7 @@ void Gestor::menu()
             break;
 
             case OPC_MODIFICAR:
-                //modificar();
+                modificar();
             break;
 
             case OPC_BUSCAR:
@@ -318,14 +318,15 @@ void Gestor::eliminar()
         }
     }
 }
-/*
+
 void Gestor::modificar()
 {   
-    Usuario usuarioTmp;
+    Usuario usuario;
     unsigned int codMod;
+    unsigned int tmpInt;
     char opc;
-    char auxChar;
-    unsigned char tam;
+    float tmpFloat;
+    char tmpStr[LARGO_NOMBRE];
     bool found = false;
     string aux;
     fstream archivo("usuarios.bin", ios::out | ios::in);
@@ -345,8 +346,8 @@ void Gestor::modificar()
             do
             {
                 cout << endl
-                     << " Seleccione el campo a modificar:" << endl;
-                cout << char(OPC_CAMPO_NOM) << ") Nombre" << endl
+                     << " Seleccione el campo a modificar:" << endl
+                     << char(OPC_CAMPO_NOM) << ") Nombre" << endl
                      << char(OPC_CAMPO_APE) << ") Apellido" << endl
                      << char(OPC_CAMPO_EDAD) << ") Edad" << endl
                      << char(OPC_CAMPO_SEXO) << ") Sexo" << endl
@@ -360,143 +361,75 @@ void Gestor::modificar()
             
             if (opc != OPC_CAMPO_CANCELAR)
             {
-                while (codMod--)
+                for (unsigned int i = 0; i < m_codigos.size(); ++i)
                 {
-                    for (int i = 0; i < CANTIDAD_CAMPOS; ++i)
-                    {
-                        archivo.read((char*)&tam, sizeof(tam));
-                        if (archivo.eof())
-                            break;
-                        
-                        aux = "";
-                        for (int j = 0; j < int(tam); ++j)
-                        {
-                            archivo.get(auxChar);
-                            aux += auxChar;
-                        }
-                        
-                        if (!codMod)
-                        {
-                            switch (i)
-                            {
-                                case CAMPO_COD:
-                                    usuarioTmp.setCodigo(aux);
-                                break;
-                                case CAMPO_EDAD:
-                                    usuarioTmp.setEdad(stoi(aux));
-                                break;
-                                case CAMPO_PESO:
-                                    usuarioTmp.setPeso(stof(aux));
-                                break;
-                                case CAMPO_SEXO:
-                                    usuarioTmp.setGenero(aux[0]);
-                                break;
-                                case CAMPO_ALTURA:
-                                    usuarioTmp.setAltura(stof(aux));
-                                break;
-                                case CAMPO_APE:
-                                    usuarioTmp.setApellido(aux);
-                                break;
-                                case CAMPO_NOM:
-                                    usuarioTmp.setNombre(aux);
-                                break;
-                                case CAMPO_TIPO_SANGRE:
-                                    usuarioTmp.setTipoSangre(aux);
-                                break;
-                                case CAMPO_MASA:
-                                    usuarioTmp.setMasaCorporal(stof(aux));
-                                break;
-                            }
-                        }
-                    }
-                }
-                modificar_datos(usuarioTmp, opc);
-                
-                archivo.seekg(0);
-                while (!archivo.eof())
-                {
-                    for (int i = 0; i < CANTIDAD_CAMPOS; ++i)
-                    {
-                        archivo.read((char*)&tam, sizeof(tam));
-                        if (archivo.eof())
-                            break;
+                    archivo.read((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
+                    usuario.setCodigo(tmpStr);
 
-                        aux = "";
-                        for (int j = 0; j < int(tam); ++j)
-                        {
-                            archivo.get(auxChar);
-                            aux += auxChar;
-                        }
-                        if (!i && aux == usuarioTmp.getCodigo())
-                            found = true;
-                        
-                        if (found)
-                        {
-                            switch (i)
-                            {
-                                case CAMPO_COD:
-                                    tam = usuarioTmp.getCodigo().length();
-                                    tmp.write((char*)&tam, sizeof(tam));
-                                    tmp << usuarioTmp.getCodigo();
-                                break;
-                                case CAMPO_EDAD:
-                                    tam = to_string(usuarioTmp.getEdad()).length();
-                                    tmp.write((char*)&tam, sizeof(tam));
-                                    tmp << to_string(usuarioTmp.getEdad());
-                                break;
-                                case CAMPO_PESO:
-                                    tam = to_string(usuarioTmp.getPeso()).length();
-                                    tmp.write((char*)&tam, sizeof(tam));
-                                    tmp << to_string(usuarioTmp.getPeso());
-                                break;
-                                case CAMPO_SEXO:
-                                    tam = CHAR_SIZE;
-                                    tmp.write((char*)&tam, sizeof(tam));
-                                    tmp << usuarioTmp.getGenero();
-                                break;
-                                case CAMPO_ALTURA:
-                                    tam = to_string(usuarioTmp.getAltura()).length();
-                                    tmp.write((char*)&tam, sizeof(tam));
-                                    tmp << to_string(usuarioTmp.getAltura());
-                                    found = false;
-                                break;
-                                case CAMPO_APE:
-                                    tam = usuarioTmp.getApellido().length();
-                                    tmp.write((char*)&tam, sizeof(tam));
-                                    tmp << usuarioTmp.getApellido();
-                                break;
-                                case CAMPO_NOM:
-                                    tam = usuarioTmp.getNombre().length();
-                                    tmp.write((char*)&tam, sizeof(tam));
-                                    tmp << usuarioTmp.getNombre();
-                                break;
-                                case CAMPO_TIPO_SANGRE:
-                                    tam = usuarioTmp.getTipoSangre().length();
-                                    tmp.write((char*)&tam, sizeof(tam));
-                                    tmp << usuarioTmp.getTipoSangre();
-                                break;
-                                case CAMPO_MASA:
-                                    tam = to_string(usuarioTmp.getMasaCorporal()).length();
-                                    tmp.write((char*)&tam, sizeof(tam));
-                                    tmp << to_string(usuarioTmp.getMasaCorporal());
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            tmp.write((char*)&tam, sizeof(tam));
-                            tmp << aux;
-                        }
-                    }   
+                    archivo.read((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
+                    usuario.setNombre(tmpStr);
+
+                    archivo.read((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
+                    usuario.setApellido(tmpStr);
+
+                    archivo.read((char*)&tmpInt, sizeof(tmpInt));
+                    usuario.setEdad(tmpInt);
+
+                    archivo.read((char*)&tmpStr[0], sizeof(char));
+                    usuario.setGenero(tmpStr[0]);
+
+                    archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+                    usuario.setPeso(tmpFloat);
+
+                    archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+                    usuario.setMasaCorporal(tmpFloat);
+
+                    archivo.read((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
+                    usuario.setTipoSangre(tmpStr);
+                    
+                    archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+                    usuario.setAltura(tmpFloat);
+
+                    if (i + 1 == codMod)
+                    {
+                        modificar_datos(usuario, opc);
+                    }
+
+                    strcpy(tmpStr, usuario.getCodigo());
+                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
+
+                    strcpy(tmpStr, usuario.getNombre());
+                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
+
+                    strcpy(tmpStr, usuario.getApellido());
+                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
+
+                    tmpInt = usuario.getEdad();
+                    tmp.write((char*)&tmpInt, sizeof(tmpInt));
+
+                    tmpStr[0] = usuario.getGenero();
+                    tmp.write((char*)&tmpStr[0], sizeof(char));
+
+                    tmpFloat = usuario.getPeso();
+                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
+
+                    tmpFloat = usuario.getMasaCorporal();
+                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
+
+                    strcpy(tmpStr, usuario.getTipoSangre());
+                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
+                    
+                    tmpFloat = usuario.getAltura();
+                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
                 }
                 tmp.close();
                 archivo.close();
                 remove("usuarios.bin");
                 rename("usuarios.tmp", "usuarios.bin");
-
+                
                 cout << endl
-                     << " Dato modificado correctamente" << endl
-                     << " Presione ENTER para continuar..." << endl;
+                    << " Dato modificado correctamente" << endl
+                    << " Presione ENTER para continuar..." << endl;
             }
         }
         else if (!codMod)
@@ -510,7 +443,7 @@ void Gestor::modificar()
         }
     }
 }
-*/
+
 
 void Gestor::mostrar()
 {
@@ -736,7 +669,7 @@ bool Gestor::codigo_usado(const string codigo)
     return false;
 }
 
-/*
+
 void Gestor::modificar_datos(Usuario& usuario, char i)
 {
     bool continuar = false;
@@ -772,7 +705,8 @@ void Gestor::modificar_datos(Usuario& usuario, char i)
                 else
                     continuar = true;
             } while (!continuar);
-            usuario.setNombre(nombre);
+            nombre += '\0';
+            usuario.setNombre(nombre.c_str());
         }
         break;
 
@@ -796,7 +730,8 @@ void Gestor::modificar_datos(Usuario& usuario, char i)
                 else
                     continuar = true;
             }while(!continuar);
-            usuario.setApellido(apellido);
+            apellido += '\0';
+            usuario.setApellido(apellido.c_str());
         }
         break;
 
@@ -863,7 +798,8 @@ void Gestor::modificar_datos(Usuario& usuario, char i)
                 else
                     continuar = true;
             }while(!continuar);
-            usuario.setTipoSangre(tipoSangre);
+            tipoSangre += '\0';
+            usuario.setTipoSangre(tipoSangre.c_str());
         }
         break;
 
@@ -882,4 +818,3 @@ void Gestor::modificar_datos(Usuario& usuario, char i)
         break;
     }
 }
-*/

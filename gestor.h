@@ -31,11 +31,8 @@ public:
     void eliminar();
     bool codigo_usado(const string codigo);
     void capturar_datos(Usuario& usuario);
-    /*
     void modificar();
-    void escribir();
     void modificar_datos(Usuario& usuario, char i);
-    */
 
 private:
     vector<string> m_codigos;
