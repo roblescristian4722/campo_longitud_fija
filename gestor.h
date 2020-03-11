@@ -35,7 +35,7 @@ public:
     void modificar_datos(Usuario& usuario, char i);
 
 private:
-    vector<string> m_codigos;
+    vector<Usuario> m_codigos;
     enum OPC_MENU
     {
         OPC_CAPTURAR = '1',

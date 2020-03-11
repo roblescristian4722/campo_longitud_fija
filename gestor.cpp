@@ -2,10 +2,6 @@
 
 Gestor::Gestor()
 {
-    char tmpCod[LARGO_CODIGO];
-    char tmpStr[LARGO_NOMBRE];
-    unsigned int tmpInt;
-    float tmpFloat;
     fstream archivo("usuarios.bin", ios::out | ios::in | ios::binary);
     Usuario tmpUsuario;
 
@@ -19,19 +15,10 @@ Gestor::Gestor()
         archivo.seekg(0);
         while (!archivo.eof())
         {
-            archivo.read((char*)&tmpCod, sizeof(tmpCod));
+            archivo.read((char*)&tmpUsuario, sizeof(tmpUsuario));
             if (archivo.eof())
                 break;
-
-            m_codigos.push_back(tmpCod);
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
-            archivo.read((char*)&tmpInt, sizeof(tmpInt));
-            archivo.read((char*)&tmpStr[0], sizeof(char));
-            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
-            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
+            m_codigos.push_back(tmpUsuario);
         }
         archivo.close();
     }
@@ -100,12 +87,9 @@ void Gestor::menu()
 
 void Gestor::buscar()
 {
-    char tmpStr[LARGO_NOMBRE];
-    unsigned int tmpInt;
-    float tmpFloat;
-    bool found = false;
     string codigo;
     Usuario usuarioTmp;
+    bool found = false;
     fstream archivo("usuarios.bin", ios::in);
 
     if (!m_codigos.size())
@@ -118,34 +102,7 @@ void Gestor::buscar()
 
         for (unsigned int i = 0; i < m_codigos.size(); ++i)
         {
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
-            usuarioTmp.setCodigo(tmpStr);
-
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
-            usuarioTmp.setNombre(tmpStr);
-
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
-            usuarioTmp.setApellido(tmpStr);
-
-            archivo.read((char*)&tmpInt, sizeof(tmpInt));
-            usuarioTmp.setEdad(tmpInt);
-
-            archivo.read((char*)&tmpStr[0], sizeof(char));
-            usuarioTmp.setGenero(tmpStr[0]);
-
-            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-            usuarioTmp.setPeso(tmpFloat);
-
-            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-            usuarioTmp.setMasaCorporal(tmpFloat);
-
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
-            usuarioTmp.setTipoSangre(tmpStr);
-            
-            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-            usuarioTmp.setAltura(tmpFloat);
-
-            cout << m_codigos[i] << " | " << usuarioTmp.getCodigo() << endl;
+            archivo.read((char*)&usuarioTmp, sizeof(usuarioTmp));
 
             if (codigo == usuarioTmp.getCodigo())
             {
@@ -182,49 +139,22 @@ void Gestor::capturar(const Usuario& usuario)
 
     if (!archivo.is_open())
         cerr << "Error en el archivo de salida" << endl;
-    
-    strcpy(tmpStr, usuario.getCodigo());
-    archivo.write((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
-    m_codigos.push_back(tmpStr);
-
-    strcpy(tmpStr, usuario.getNombre());
-    archivo.write((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
-
-    strcpy(tmpStr, usuario.getApellido());
-    archivo.write((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
-
-    tmpInt = usuario.getEdad();
-    archivo.write((char*)&tmpInt, sizeof(tmpInt));
-
-    tmpStr[0] = usuario.getGenero();
-    archivo.write((char*)&tmpStr[0], sizeof(char));
-
-    tmpFloat = usuario.getPeso();
-    archivo.write((char*)&tmpFloat, sizeof(tmpFloat));
-
-    tmpFloat = usuario.getMasaCorporal();
-    archivo.write((char*)&tmpFloat, sizeof(tmpFloat));
-
-    strcpy(tmpStr, usuario.getTipoSangre());
-    archivo.write((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
-    
-    tmpFloat = usuario.getAltura();
-    archivo.write((char*)&tmpFloat, sizeof(tmpFloat));
-
-    
-    archivo.close();
-    cout << endl
-        << " Usuario añadido exitosamente." << endl
-        << " Presione ENTER para continuar..." << endl;
+    else
+    {
+        archivo.write((char*)&usuario, sizeof(usuario));
+        m_codigos.push_back(usuario);
+        
+        archivo.close();
+        cout << endl
+            << " Usuario añadido exitosamente." << endl
+            << " Presione ENTER para continuar..." << endl;
+    }
 }
 
 void Gestor::eliminar()
 {
     bool found = false;
     unsigned int opc;
-    unsigned int tmpInt;
-    float tmpFloat;
-    char tmpStr[LARGO_NOMBRE];
     string aux;
     Usuario usuario;
     fstream archivo("usuarios.bin", ios::in | ios::out);
@@ -242,62 +172,9 @@ void Gestor::eliminar()
         {
             for (unsigned int i = 0; i < m_codigos.size(); ++i)
             {
-                archivo.read((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
-                usuario.setCodigo(tmpStr);
-
-                archivo.read((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
-                usuario.setNombre(tmpStr);
-
-                archivo.read((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
-                usuario.setApellido(tmpStr);
-
-                archivo.read((char*)&tmpInt, sizeof(tmpInt));
-                usuario.setEdad(tmpInt);
-
-                archivo.read((char*)&tmpStr[0], sizeof(char));
-                usuario.setGenero(tmpStr[0]);
-
-                archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-                usuario.setPeso(tmpFloat);
-
-                archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-                usuario.setMasaCorporal(tmpFloat);
-
-                archivo.read((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
-                usuario.setTipoSangre(tmpStr);
-                
-                archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-                usuario.setAltura(tmpFloat);
-
+                archivo.read((char*)&usuario, sizeof(usuario));
                 if (i + 1 != opc)
-                {
-                    strcpy(tmpStr, usuario.getCodigo());
-                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
-
-                    strcpy(tmpStr, usuario.getNombre());
-                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
-
-                    strcpy(tmpStr, usuario.getApellido());
-                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
-
-                    tmpInt = usuario.getEdad();
-                    tmp.write((char*)&tmpInt, sizeof(tmpInt));
-
-                    tmpStr[0] = usuario.getGenero();
-                    tmp.write((char*)&tmpStr[0], sizeof(char));
-
-                    tmpFloat = usuario.getPeso();
-                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
-
-                    tmpFloat = usuario.getMasaCorporal();
-                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
-
-                    strcpy(tmpStr, usuario.getTipoSangre());
-                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
-                    
-                    tmpFloat = usuario.getAltura();
-                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
-                }
+                    tmp.write((char*)&usuario, sizeof(usuario));
             }
             m_codigos.erase(m_codigos.begin() + opc - 1);
             tmp.close();
@@ -321,10 +198,7 @@ void Gestor::modificar()
 {   
     Usuario usuario;
     unsigned int codMod;
-    unsigned int tmpInt;
     char opc;
-    float tmpFloat;
-    char tmpStr[LARGO_NOMBRE];
     bool found = false;
     string aux;
     fstream archivo("usuarios.bin", ios::out | ios::in);
@@ -361,64 +235,12 @@ void Gestor::modificar()
             {
                 for (unsigned int i = 0; i < m_codigos.size(); ++i)
                 {
-                    archivo.read((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
-                    usuario.setCodigo(tmpStr);
-
-                    archivo.read((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
-                    usuario.setNombre(tmpStr);
-
-                    archivo.read((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
-                    usuario.setApellido(tmpStr);
-
-                    archivo.read((char*)&tmpInt, sizeof(tmpInt));
-                    usuario.setEdad(tmpInt);
-
-                    archivo.read((char*)&tmpStr[0], sizeof(char));
-                    usuario.setGenero(tmpStr[0]);
-
-                    archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-                    usuario.setPeso(tmpFloat);
-
-                    archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-                    usuario.setMasaCorporal(tmpFloat);
-
-                    archivo.read((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
-                    usuario.setTipoSangre(tmpStr);
-                    
-                    archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-                    usuario.setAltura(tmpFloat);
+                    archivo.read((char*)&usuario, sizeof(usuario));
 
                     if (i + 1 == codMod)
-                    {
                         modificar_datos(usuario, opc);
-                    }
 
-                    strcpy(tmpStr, usuario.getCodigo());
-                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
-
-                    strcpy(tmpStr, usuario.getNombre());
-                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
-
-                    strcpy(tmpStr, usuario.getApellido());
-                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
-
-                    tmpInt = usuario.getEdad();
-                    tmp.write((char*)&tmpInt, sizeof(tmpInt));
-
-                    tmpStr[0] = usuario.getGenero();
-                    tmp.write((char*)&tmpStr[0], sizeof(char));
-
-                    tmpFloat = usuario.getPeso();
-                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
-
-                    tmpFloat = usuario.getMasaCorporal();
-                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
-
-                    strcpy(tmpStr, usuario.getTipoSangre());
-                    tmp.write((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
-                    
-                    tmpFloat = usuario.getAltura();
-                    tmp.write((char*)&tmpFloat, sizeof(tmpFloat));
+                    tmp.write((char*)&usuario, sizeof(usuario));
                 }
                 tmp.close();
                 archivo.close();
@@ -447,9 +269,6 @@ void Gestor::mostrar()
 {
     unsigned long cont = 0;
     fstream archivo("usuarios.bin", ios::in);
-    char tmpStr[LARGO_NOMBRE];
-    unsigned int tmpInt;
-    float tmpFloat;
     Usuario usuario;
 
     if (!archivo.is_open())
@@ -461,32 +280,8 @@ void Gestor::mostrar()
         {
             if (archivo.eof())
                 break;
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_CODIGO]));
-            usuario.setCodigo(tmpStr);
-
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_NOMBRE]));
-            usuario.setNombre(tmpStr);
-
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_APELLIDO]));
-            usuario.setApellido(tmpStr);
-
-            archivo.read((char*)&tmpInt, sizeof(tmpInt));
-            usuario.setEdad(tmpInt);
-
-            archivo.read((char*)&tmpStr[0], sizeof(char));
-            usuario.setGenero(tmpStr[0]);
-
-            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-            usuario.setPeso(tmpFloat);
-
-            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-            usuario.setMasaCorporal(tmpFloat);
-
-            archivo.read((char*)&tmpStr, sizeof(char[LARGO_TIPO_SANGRE]));
-            usuario.setTipoSangre(tmpStr);
             
-            archivo.read((char*)&tmpFloat, sizeof(tmpFloat));
-            usuario.setAltura(tmpFloat);
+            archivo.read((char*)&usuario, sizeof(usuario));
             ++ cont;
 
             if (cont)
@@ -662,7 +457,7 @@ void Gestor::capturar_datos(Usuario& usuario)
 bool Gestor::codigo_usado(const string codigo)
 {
     for (int i = 0; i < m_codigos.size(); i++)
-        if (codigo == m_codigos[i])
+        if (codigo == m_codigos[i].getCodigo())
             return true;
     return false;
 }
